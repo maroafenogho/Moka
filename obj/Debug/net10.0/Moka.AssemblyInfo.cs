@@ -10,10 +10,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("4bcec0c5-0b1e-459e-bb70-534f099674c0")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("Moka")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4fe62edf4c88d718f598b5f726ac1e9d0d34541c")]
 [assembly: System.Reflection.AssemblyProductAttribute("Moka")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Moka")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

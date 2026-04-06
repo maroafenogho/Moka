@@ -1,4 +1,4 @@
-using Moka.src.Authentication.Entities;
+using Moka.src.Authentication.Domain.Entities;
 
 namespace Moka.src.Authentication.Domain.Interfaces;
 

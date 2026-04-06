@@ -3,18 +3,13 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Moka.src.Authentication.Domain.Interfaces;
-using Moka.src.Authentication.Entities;
+using Moka.src.Authentication.Domain.Entities;
 
 namespace Moka.src.Authentication.Services;
 
-public class JwtService : IJwtService
+public class JwtService(IConfiguration config) : IJwtService
 {
-    private readonly IConfiguration _config;
-
-    public JwtService(IConfiguration config)
-    {
-        _config = config;
-    }
+    private readonly IConfiguration _config = config;
 
     string GenerateToken(User user)
     {
@@ -34,10 +29,10 @@ public class JwtService : IJwtService
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: _config["Jwt:Issuer"],
-            audience: _config["Jwt:Audience"],
+            issuer: _config["marocodes"],
+            audience: _config["Moka"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(1),
+            expires: DateTime.UtcNow.AddMinutes(15),
             signingCredentials: creds
         );
 
