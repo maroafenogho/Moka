@@ -1,6 +1,5 @@
-namespace Moka.Application.Features.Auth.Register;
+namespace Moka.src.Authentication.Domain.Dto;
 
-// We use 'record' for DTOs because they are immutable and lightweight
 public record RegisterRequest(
     string Email,
     string Password,

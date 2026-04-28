@@ -1,5 +1,6 @@
 
 using Moka.src.Authentication.Domain.Interfaces;
+using Moka.src.Brokerage.Domain.Entities;
 using Moka.src.Shared;
 
 namespace Moka.src.Authentication.Domain.Entities
@@ -12,18 +13,11 @@ namespace Moka.src.Authentication.Domain.Entities
         public string LastName { get; private set; }
         public string? MiddleName { get; private set; }
         public DateTime CreatedAt { get; private set; }
+        public Profile Profile { get; set; }
 
-        private User()
-        {
-            Email = string.Empty;
-            PasswordHash = string.Empty;
-            FirstName = string.Empty;
-            LastName = string.Empty;
-            CreatedAt = DateTime.UtcNow;
-            MiddleName = null;
-        }
+        private User() { }
 
-        public static Result<User> Create(string email, string password, IPasswordHasher hasher)
+        public static Result<User> Create(string email, string password, string firstName, string lastName, string? middleName, IPasswordHasher hasher)
         {
             if (string.IsNullOrWhiteSpace(email))
                 return Result<User>.Failure("Email required");
@@ -34,6 +28,10 @@ namespace Moka.src.Authentication.Domain.Entities
             var user = new User
             {
                 Email = email,
+                FirstName = firstName,
+                LastName = lastName,
+                MiddleName = middleName,
+                CreatedAt = DateTime.UtcNow,
                 PasswordHash = hasher.Hash(password)
             };
 

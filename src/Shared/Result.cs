@@ -29,8 +29,10 @@ namespace Moka.src.Shared
         public bool IsSuccess { get; }
         public bool IsFailure => !IsSuccess;
         public string? Error { get; }
+        public object? Value { get; }
 
-        protected internal Result(bool isSuccess, string? error)
+
+        protected internal Result(bool isSuccess, object? value, string? error)
         {
             if (isSuccess && error != null)
                 throw new InvalidOperationException();
@@ -38,10 +40,11 @@ namespace Moka.src.Shared
                 throw new InvalidOperationException();
 
             IsSuccess = isSuccess;
+            Value = value;
             Error = error;
         }
 
-        public static Result Success() => new Result(true, null);
-        public static Result Failure(string error) => new Result(false, error);
+        public static Result Success() => new Result(true, null, null);
+        public static Result Failure(string error) => new Result(false, null, error);
     }
 }
