@@ -11,7 +11,7 @@ public class JwtService(IConfiguration config) : IJwtService
 {
     private readonly IConfiguration _config = config;
 
-    string GenerateToken(User user)
+    public string GenerateToken(User user)
     {
         var claims = new[]
         {
@@ -29,8 +29,8 @@ public class JwtService(IConfiguration config) : IJwtService
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: _config["marocodes"],
-            audience: _config["Moka"],
+            issuer: _config["Jwt:Issuer"],
+            audience: _config["Jwt:Audience"],
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(15),
             signingCredentials: creds
@@ -39,13 +39,35 @@ public class JwtService(IConfiguration config) : IJwtService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    string IJwtService.GenerateToken(User user)
+    public Guid? ValidateToken(string token)
     {
-        return GenerateToken(user);
-    }
+        var keyString = _config["Jwt:Key"]
+            ?? throw new InvalidOperationException("Jwt:Key is not configured.");
 
-    Guid? IJwtService.ValidateToken(string token)
-    {
-        throw new NotImplementedException();
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString)),
+            ValidateIssuer = !string.IsNullOrWhiteSpace(_config["Jwt:Issuer"]),
+            ValidIssuer = _config["Jwt:Issuer"],
+            ValidateAudience = !string.IsNullOrWhiteSpace(_config["Jwt:Audience"]),
+            ValidAudience = _config["Jwt:Audience"],
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+
+        try
+        {
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
+            var userId = principal.FindFirstValue(JwtRegisteredClaimNames.Sub)
+                ?? principal.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            return Guid.TryParse(userId, out var parsedUserId) ? parsedUserId : null;
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

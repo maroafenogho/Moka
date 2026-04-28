@@ -2,7 +2,6 @@ using Moka.src.Authentication.Domain.Entities;
 using Moka.src.Authentication.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Moka.src.Shared;
-using Moka.src.Authentication.Domain.Dto;
 
 namespace Moka.src.Authentication.Infrastructure
 {
@@ -17,18 +16,9 @@ namespace Moka.src.Authentication.Infrastructure
             return user != null ? Result<User>.Success(user) : Result<User>.Failure("User not found");
         }
 
-        public async Task<Result> AddUserAsync(RegisterRequest user)
+        public async Task<Result> AddUserAsync(User user)
         {
-            var userEntity = new User
-            {
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                MiddleName = user.MiddleName,
-                CreatedAt = DateTime.UtcNow,
-                PasswordHash = user.Password // In a real app, hash the password before storing
-            };
-            await _context.Users.AddAsync(userEntity);
+            await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
             return Result.Success();
         }

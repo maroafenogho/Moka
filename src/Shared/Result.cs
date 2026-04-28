@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+
 namespace Moka.src.Shared
 {
     public class Result<T>
@@ -46,5 +48,24 @@ namespace Moka.src.Shared
 
         public static Result Success() => new Result(true, null, null);
         public static Result Failure(string error) => new Result(false, null, error);
+    }
+
+    public static class ResultExtensions
+    {
+        public static IActionResult ToActionResult<T>(this Result<T> result)
+        {
+            if (result.IsSuccess)
+                return new OkObjectResult(Result<T>.Success(result.Value!));
+
+            return new BadRequestObjectResult(Result<T>.Failure(result.Error ?? "An error occurred"));
+        }
+
+        public static IActionResult ToActionResult(this Result result)
+        {
+            if (result.IsSuccess)
+                return new OkObjectResult(Result.Success());
+
+            return new BadRequestObjectResult(Result.Failure(result.Error ?? "An error occurred"));
+        }
     }
 }

@@ -1,5 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
+using Moka.src.Authentication.Application;
 using Moka.src.Authentication.Domain.Interfaces;
 using Moka.src.Authentication.Infrastructure;
 using Moka.src.Authentication.Services;
@@ -15,8 +16,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
     ));
 builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserRepository, EfUserRepository>();
 builder.Services.AddScoped<AuthenticationService>();
+builder.Services.AddScoped<RegisterUseCase>();
+builder.Services.AddScoped<LoginUseCase>();
 builder.Services.AddScoped<IBrokerageService, BrokerageService>();
 
 builder.Services.AddControllers();
