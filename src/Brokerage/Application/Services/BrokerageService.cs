@@ -13,17 +13,32 @@ namespace Moka.src.Brokerage.Application.Services
 
         public async Task<Result> CreateProfileAsync(CreateProfileDto dto)
         {
+            if (!Guid.TryParse(dto.UserId, out var userId))
+                return Result.Failure("Invalid user id");
+
+            if (!Enum.TryParse<ProfileType>(dto.ProfileType, true, out var profileType))
+                return Result.Failure($"Invalid profile type: {dto.ProfileType}");
+
+            if (string.IsNullOrWhiteSpace(dto.CompanyName))
+                return Result.Failure("Company name required");
+
+            var userExists = await _context.Users
+               .AnyAsync(user => user.UserId == userId);
+
+            if (!userExists)
+                return Result.Failure("User not found");
+
             var exists = await _context.Profiles
-               .AnyAsync(x => x.UserId.ToString() == dto.UserId);
+               .AnyAsync(profile => profile.UserId == userId && profile.Type == profileType);
 
             if (exists)
-                return Result.Failure("User already has a profile");
+                return Result.Failure($"User already has a {profileType} profile");
 
             var profile = new Profile
             {
-                UserId = Guid.Parse(dto.UserId),
-                Type = Enum.Parse<ProfileType>(dto.ProfileType),
-                CompanyName = dto.CompanyName,
+                UserId = userId,
+                Type = profileType,
+                CompanyName = dto.CompanyName.Trim(),
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -32,7 +47,7 @@ namespace Moka.src.Brokerage.Application.Services
             return Result.Success();
         }
 
-        public async Task<Result<Profile>> GetProfileByIdAsync(Guid profileId)
+        public async Task<Result<Profile>> GetProfileByIdAsync(int profileId)
         {
             var profile = await _context.Profiles
                .FirstOrDefaultAsync(p => p.Id == profileId);
@@ -46,7 +61,7 @@ namespace Moka.src.Brokerage.Application.Services
             return Result<List<Profile>>.Success(profiles);
         }
 
-        public async Task<Result> UpdateProfileStatusAsync(Guid profileId, string status)
+        public async Task<Result> UpdateProfileStatusAsync(int profileId, string status)
         {
             var profile = await _context.Profiles
                .FirstOrDefaultAsync(p => p.Id == profileId);
@@ -54,12 +69,12 @@ namespace Moka.src.Brokerage.Application.Services
             if (profile == null)
                 return Result.Failure("Profile not found");
 
-            if (!Enum.TryParse<ProfileStatus>(status, out var result))
+            if (!Enum.TryParse<ProfileStatus>(status, true, out var result))
             {
-                return Result.Failure("Invalid status value: ${result}");
+                return Result.Failure($"Invalid status value: {status}");
             }
 
-            profile.Status = Enum.Parse<ProfileStatus>(status);
+            profile.Status = result;
             _context.Profiles.Update(profile);
             await _context.SaveChangesAsync();
             return Result.Success();

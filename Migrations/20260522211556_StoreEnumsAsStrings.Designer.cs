@@ -12,8 +12,8 @@ using Moka.src.Shared;
 namespace Moka.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260428104450_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260522211556_StoreEnumsAsStrings")]
+    partial class StoreEnumsAsStrings
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,9 +27,11 @@ namespace Moka.Migrations
 
             modelBuilder.Entity("Moka.src.Authentication.Domain.Entities.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -53,6 +55,9 @@ namespace Moka.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
@@ -60,29 +65,32 @@ namespace Moka.Migrations
 
             modelBuilder.Entity("Moka.src.Brokerage.Domain.Entities.Profile", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CompanyName")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
+                    b.HasIndex("UserId", "Type")
                         .IsUnique();
 
                     b.ToTable("Profiles");
@@ -97,8 +105,8 @@ namespace Moka.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<Guid>("BrokerProfileId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("BrokerProfileId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -107,11 +115,12 @@ namespace Moka.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
-                    b.Property<Guid>("UnderwriterProfileId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("UnderwriterProfileId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -125,8 +134,9 @@ namespace Moka.Migrations
             modelBuilder.Entity("Moka.src.Brokerage.Domain.Entities.Profile", b =>
                 {
                     b.HasOne("Moka.src.Authentication.Domain.Entities.User", "User")
-                        .WithOne("Profile")
-                        .HasForeignKey("Moka.src.Brokerage.Domain.Entities.Profile", "UserId")
+                        .WithMany("Profiles")
+                        .HasForeignKey("UserId")
+                        .HasPrincipalKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -154,8 +164,7 @@ namespace Moka.Migrations
 
             modelBuilder.Entity("Moka.src.Authentication.Domain.Entities.User", b =>
                 {
-                    b.Navigation("Profile")
-                        .IsRequired();
+                    b.Navigation("Profiles");
                 });
 #pragma warning restore 612, 618
         }

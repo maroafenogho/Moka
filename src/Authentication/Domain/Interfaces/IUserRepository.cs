@@ -6,6 +6,7 @@ namespace Moka.src.Authentication.Domain.Interfaces
     public interface IUserRepository
     {
         Task<Result<User>> GetUserByEmailAsync(string email);
+        Task<Result<User>> GetUserByIdAsync(Guid userId);
         Task<Result> AddUserAsync(User user);
     }
 }

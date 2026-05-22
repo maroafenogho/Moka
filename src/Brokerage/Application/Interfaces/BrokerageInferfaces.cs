@@ -7,8 +7,8 @@ namespace Moka.src.Brokerage.Application.Interfaces
     public interface IBrokerageService
     {
         Task<Result> CreateProfileAsync(CreateProfileDto dto);
-        Task<Result<Profile>> GetProfileByIdAsync(Guid profileId);
-        Task<Result> UpdateProfileStatusAsync(Guid profileId, string status);
+        Task<Result<Profile>> GetProfileByIdAsync(int profileId);
+        Task<Result> UpdateProfileStatusAsync(int profileId, string status);
         Task<Result<List<Profile>>> GetProfilesAsync();
 
     }

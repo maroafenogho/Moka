@@ -16,9 +16,22 @@ namespace Moka.src.Shared
             base.OnModelCreating(modelBuilder); // Always include this
 
             modelBuilder.Entity<User>()
-                .HasOne(u => u.Profile)
+                .HasMany(u => u.Profiles)
                 .WithOne(p => p.User)
-                .HasForeignKey<Profile>(p => p.UserId);
+                .HasForeignKey(p => p.UserId)
+                .HasPrincipalKey(u => u.UserId);
+
+            modelBuilder.Entity<Profile>()
+                .HasIndex(p => new { p.UserId, p.Type })
+                .IsUnique();
+
+            modelBuilder.Entity<Profile>()
+                .Property(p => p.Type)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Profile>()
+                .Property(p => p.Status)
+                .HasConversion<string>();
 
             modelBuilder.Entity<InsurancePremium>()
                 .HasOne(p => p.BrokerProfile)
@@ -31,6 +44,10 @@ namespace Moka.src.Shared
                 .WithMany()
                 .HasForeignKey(p => p.UnderwriterProfileId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<InsurancePremium>()
+                .Property(p => p.Status)
+                .HasConversion<string>();
         }
     }
 }

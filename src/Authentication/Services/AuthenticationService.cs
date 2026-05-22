@@ -1,6 +1,8 @@
 using Moka.src.Authentication.Domain.Dto;
 using Moka.src.Authentication.Domain.Entities;
 using Moka.src.Authentication.Domain.Interfaces;
+using Moka.src.Brokerage.Domain.Entities;
+using Moka.src.Brokerage.Domain.Enums;
 using Moka.src.Shared;
 
 namespace Moka.src.Authentication.Services;
@@ -23,15 +25,25 @@ public class AuthenticationService(
             return Result<AuthenticationResponse>.Failure("User with this email already exists");
 
         var userResult = User.Create(
-               email,
+            email,
             request.Password,
             request.FirstName,
             request.LastName,
             request.MiddleName,
-            _passwordHasher, request.Profile);
+            _passwordHasher);
 
         if (userResult.IsFailure || userResult.Data is null)
             return Result<AuthenticationResponse>.Failure(userResult.Error ?? "Could not create user");
+
+        foreach (var profileRequest in request.GetRequestedProfiles())
+        {
+            if (!Enum.TryParse<ProfileType>(profileRequest.ProfileType, true, out var profileType))
+                return Result<AuthenticationResponse>.Failure($"Invalid profile type: {profileRequest.ProfileType}");
+
+            var addProfileResult = userResult.Data.AddProfile(profileType, profileRequest.CompanyName);
+            if (addProfileResult.IsFailure)
+                return Result<AuthenticationResponse>.Failure(addProfileResult.Error ?? "Could not add profile");
+        }
 
         var saveResult = await _userRepository.AddUserAsync(userResult.Data);
         if (saveResult.IsFailure)
@@ -55,14 +67,48 @@ public class AuthenticationService(
         return Result<LoginUserResponse>.Success(new LoginUserResponse(_jwtService.GenerateToken(user)));
     }
 
+    public async Task<Result<UserResponse>> GetUserAsync(Guid userId)
+    {
+        var userResult = await _userRepository.GetUserByIdAsync(userId);
+
+        if (userResult.IsFailure || userResult.Data is null)
+            return Result<UserResponse>.Failure(userResult.Error ?? "User not found");
+
+        return Result<UserResponse>.Success(CreateUserResponse(userResult.Data));
+    }
+
     private AuthenticationResponse CreateResponse(User user)
     {
         return new AuthenticationResponse(
             user.Id,
+            user.UserId,
             user.Email,
             user.FirstName,
             user.LastName,
             user.MiddleName,
+            [.. user.Profiles.Select(MapProfile)],
             _jwtService.GenerateToken(user));
+    }
+
+    private static UserResponse CreateUserResponse(User user)
+    {
+        return new UserResponse(
+            user.Id,
+            user.UserId,
+            user.Email,
+            user.FirstName,
+            user.LastName,
+            user.MiddleName,
+            [.. user.Profiles.Select(MapProfile)]);
+    }
+
+    private static ProfileResponse MapProfile(Profile profile)
+    {
+        return new ProfileResponse(
+            profile.Id,
+            profile.Type.ToString(),
+            profile.Status.ToString(),
+            profile.CompanyName,
+            profile.CreatedAt);
     }
 }

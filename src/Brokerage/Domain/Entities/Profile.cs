@@ -1,11 +1,11 @@
 using Moka.src.Authentication.Domain.Entities;
 using Moka.src.Brokerage.Domain.Enums;
-using Moka.src.Shared;
 
 namespace Moka.src.Brokerage.Domain.Entities
 {
-    public class Profile : Entity
+    public class Profile
     {
+        public int Id { get; set; }
         public Guid UserId { get; set; }
         public User? User { get; set; }
         public ProfileType Type { get; set; }

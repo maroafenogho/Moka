@@ -12,7 +12,17 @@ namespace Moka.src.Authentication.Infrastructure
         public async Task<Result<User>> GetUserByEmailAsync(string email)
         {
             var user = await _context.Users
+               .Include(u => u.Profiles)
                .FirstOrDefaultAsync(u => u.Email == email);
+            return user != null ? Result<User>.Success(user) : Result<User>.Failure("User not found");
+        }
+
+        public async Task<Result<User>> GetUserByIdAsync(Guid userId)
+        {
+            var user = await _context.Users
+               .Include(u => u.Profiles)
+               .FirstOrDefaultAsync(u => u.UserId == userId);
+
             return user != null ? Result<User>.Success(user) : Result<User>.Failure("User not found");
         }
 

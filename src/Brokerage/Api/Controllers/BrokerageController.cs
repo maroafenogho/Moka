@@ -18,10 +18,10 @@ namespace Moka.src.Brokerage.Api.Controllers
             return profile.ToActionResult();
         }
 
-        [HttpGet("profile/{profileId}")]
-        public async Task<IActionResult> GetProfileByIdAsync(string profileId)
+        [HttpGet("profile/{id}")]
+        public async Task<IActionResult> GetProfileByIdAsync([FromRoute] int id)
         {
-            var profile = await _service.GetProfileByIdAsync(Guid.Parse(profileId));
+            var profile = await _service.GetProfileByIdAsync(id);
             return profile.ToActionResult();
         }
 
@@ -32,10 +32,10 @@ namespace Moka.src.Brokerage.Api.Controllers
             return profiles.ToActionResult();
         }
 
-        [HttpPut("update-profile-status/{profileId}")]
-        public async Task<IActionResult> UpdateProfileStatusAsync([FromRoute] string profileId, [FromBody] string status)
+        [HttpPut("update-profile-status/{id}")]
+        public async Task<IActionResult> UpdateProfileStatusAsync([FromRoute] int id, [FromBody] string status)
         {
-            var result = await _service.UpdateProfileStatusAsync(Guid.Parse(profileId), status);
+            var result = await _service.UpdateProfileStatusAsync(id, status);
             return result.ToActionResult();
         }
     }
