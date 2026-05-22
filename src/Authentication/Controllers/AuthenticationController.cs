@@ -7,7 +7,7 @@ namespace Moka.src.Authentication.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class RegisterController(
+public class AuthenticationController(
     RegisterUseCase registerUseCase,
     LoginUseCase loginUseCase) : ControllerBase
 {

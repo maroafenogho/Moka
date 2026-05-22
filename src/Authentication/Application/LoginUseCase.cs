@@ -8,6 +8,6 @@ public class LoginUseCase(AuthenticationService authenticationService)
 {
     private readonly AuthenticationService _authenticationService = authenticationService;
 
-    public Task<Result<AuthenticationResponse>> ExecuteAsync(LoginRequest request)
+    public Task<Result<LoginUserResponse>> ExecuteAsync(LoginRequest request)
         => _authenticationService.LoginAsync(request);
 }

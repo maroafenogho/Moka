@@ -17,7 +17,7 @@ namespace Moka.src.Authentication.Domain.Entities
 
         private User() { }
 
-        public static Result<User> Create(string email, string password, string firstName, string lastName, string? middleName, IPasswordHasher hasher)
+        public static Result<User> Create(string email, string password, string firstName, string lastName, string? middleName, IPasswordHasher hasher, Profile? profile = null)
         {
             if (hasher is null)
                 return Result<User>.Failure("Password service unavailable");

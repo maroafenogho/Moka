@@ -7,10 +7,10 @@ namespace Moka.src.Brokerage.Domain.Entities
     public class Profile : Entity
     {
         public Guid UserId { get; set; }
-        public User User { get; set; }
+        public User? User { get; set; }
         public ProfileType Type { get; set; }
         public ProfileStatus Status { get; set; } = ProfileStatus.Active;
-        public required string CompanyName { get; set; }
+        public string? CompanyName { get; set; }
         public DateTime CreatedAt { get; set; }
 
         public bool IsBroker() => Type == ProfileType.Broker;

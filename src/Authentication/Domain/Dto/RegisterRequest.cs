@@ -1,3 +1,5 @@
+using Moka.src.Brokerage.Domain.Entities;
+
 namespace Moka.src.Authentication.Domain.Dto;
 
 public record RegisterRequest(
@@ -5,4 +7,5 @@ public record RegisterRequest(
     string Password,
     string FirstName,
     string LastName,
-    string? MiddleName);
+    string? MiddleName,
+    Profile? Profile);

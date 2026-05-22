@@ -7,22 +7,22 @@ namespace Moka.src.Shared
         public bool IsSuccess { get; }
         public bool IsFailure => !IsSuccess;
         public string? Error { get; }
-        public T? Value { get; }
+        public T? Data { get; }
 
-        protected internal Result(bool isSuccess, T? value, string? error)
+        protected internal Result(bool isSuccess, T? data, string? error)
         {
             if (isSuccess && error != null)
                 throw new InvalidOperationException("Successful result cannot have an error message.");
 
-            if (!isSuccess && value != null)
-                throw new InvalidOperationException("Failed result cannot have a value.");
+            if (!isSuccess && data != null)
+                throw new InvalidOperationException("Failed result cannot have a data.");
 
             IsSuccess = isSuccess;
-            Value = value;
+            Data = data;
             Error = error;
         }
 
-        public static Result<T> Success(T value) => new Result<T>(true, value, null);
+        public static Result<T> Success(T data) => new Result<T>(true, data, null);
         public static Result<T> Failure(string error) => new Result<T>(false, default, error);
 
     }
@@ -31,10 +31,10 @@ namespace Moka.src.Shared
         public bool IsSuccess { get; }
         public bool IsFailure => !IsSuccess;
         public string? Error { get; }
-        public object? Value { get; }
+        public object? Data { get; }
 
 
-        protected internal Result(bool isSuccess, object? value, string? error)
+        protected internal Result(bool isSuccess, object? data, string? error)
         {
             if (isSuccess && error != null)
                 throw new InvalidOperationException();
@@ -42,7 +42,7 @@ namespace Moka.src.Shared
                 throw new InvalidOperationException();
 
             IsSuccess = isSuccess;
-            Value = value;
+            Data = data;
             Error = error;
         }
 
@@ -55,7 +55,7 @@ namespace Moka.src.Shared
         public static IActionResult ToActionResult<T>(this Result<T> result)
         {
             if (result.IsSuccess)
-                return new OkObjectResult(Result<T>.Success(result.Value!));
+                return new OkObjectResult(Result<T>.Success(result.Data!));
 
             return new BadRequestObjectResult(Result<T>.Failure(result.Error ?? "An error occurred"));
         }

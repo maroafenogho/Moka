@@ -9,6 +9,7 @@ namespace Moka.src.Authentication.Services;
 
 public class JwtService(IConfiguration config) : IJwtService
 {
+    private const int MinimumHmacSha256KeyBytes = 32;
     private readonly IConfiguration _config = config;
 
     public string GenerateToken(User user)
@@ -19,12 +20,7 @@ public class JwtService(IConfiguration config) : IJwtService
             new Claim(JwtRegisteredClaimNames.Email, user.Email)
         };
 
-        var keyString = _config["Jwt:Key"]
-            ?? throw new InvalidOperationException("Jwt:Key is not configured.");
-
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(keyString)
-        );
+        var key = GetSigningKey();
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -41,14 +37,11 @@ public class JwtService(IConfiguration config) : IJwtService
 
     public Guid? ValidateToken(string token)
     {
-        var keyString = _config["Jwt:Key"]
-            ?? throw new InvalidOperationException("Jwt:Key is not configured.");
-
         var tokenHandler = new JwtSecurityTokenHandler();
         var validationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString)),
+            IssuerSigningKey = GetSigningKey(),
             ValidateIssuer = !string.IsNullOrWhiteSpace(_config["Jwt:Issuer"]),
             ValidIssuer = _config["Jwt:Issuer"],
             ValidateAudience = !string.IsNullOrWhiteSpace(_config["Jwt:Audience"]),
@@ -69,5 +62,23 @@ public class JwtService(IConfiguration config) : IJwtService
         {
             return null;
         }
+    }
+
+    private SymmetricSecurityKey GetSigningKey()
+    {
+        var keyString = _config["Jwt:Key"];
+        if (string.IsNullOrWhiteSpace(keyString))
+        {
+            throw new InvalidOperationException("Jwt:Key is not configured.");
+        }
+
+        var keyBytes = Encoding.UTF8.GetBytes(keyString);
+        if (keyBytes.Length < MinimumHmacSha256KeyBytes)
+        {
+            throw new InvalidOperationException(
+                $"Jwt:Key must be at least {MinimumHmacSha256KeyBytes} bytes for HS256; current key is {keyBytes.Length} bytes.");
+        }
+
+        return new SymmetricSecurityKey(keyBytes);
     }
 }

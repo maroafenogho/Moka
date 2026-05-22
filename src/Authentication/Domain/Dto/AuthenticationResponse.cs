@@ -7,3 +7,5 @@ public record AuthenticationResponse(
     string LastName,
     string? MiddleName,
     string Token);
+
+public record LoginUserResponse(string Token);
