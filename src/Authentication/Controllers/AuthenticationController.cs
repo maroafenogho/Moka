@@ -1,3 +1,6 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Moka.src.Authentication.Application;
 using Moka.src.Authentication.Domain.Dto;
@@ -33,8 +36,20 @@ public class AuthenticationController(
 
     [HttpGet("users/{userId:guid}")]
     [HttpGet("get-user/{userId:guid}")]
+    [Authorize(AuthenticationSchemes = JwtAuthenticationHandler.SchemeName)]
     public async Task<IActionResult> GetUserAsync([FromRoute] Guid userId)
     {
+        Console.WriteLine($"Token user ID: {userId}");
+        var tokenUserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
+            ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
+        if (!Guid.TryParse(tokenUserId, out var authenticatedUserId))
+            return Unauthorized();
+
+        if (authenticatedUserId != userId)
+            return Forbid();
+
         var result = await _authenticationService.GetUserAsync(userId);
         return result.ToActionResult();
     }

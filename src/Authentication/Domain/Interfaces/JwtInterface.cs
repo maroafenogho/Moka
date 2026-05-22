@@ -7,4 +7,10 @@ public interface IJwtService
 {
     string GenerateToken(User user);
     Guid? ValidateToken(string token);
+    JwtValidationResult ValidateTokenWithDetails(string token);
 }
+
+public record JwtValidationResult(
+    bool IsValid,
+    Guid? UserId,
+    string? Error);

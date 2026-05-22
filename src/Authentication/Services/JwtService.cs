@@ -7,16 +7,17 @@ using Moka.src.Authentication.Domain.Entities;
 
 namespace Moka.src.Authentication.Services;
 
-public class JwtService(IConfiguration config) : IJwtService
+public class JwtService(IConfiguration config, ILogger<JwtService> logger) : IJwtService
 {
     private const int MinimumHmacSha256KeyBytes = 32;
     private readonly IConfiguration _config = config;
+    private readonly ILogger<JwtService> _logger = logger;
 
     public string GenerateToken(User user)
     {
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email)
         };
 
@@ -37,6 +38,11 @@ public class JwtService(IConfiguration config) : IJwtService
 
     public Guid? ValidateToken(string token)
     {
+        return ValidateTokenWithDetails(token).UserId;
+    }
+
+    public JwtValidationResult ValidateTokenWithDetails(string token)
+    {
         var tokenHandler = new JwtSecurityTokenHandler();
         var validationParameters = new TokenValidationParameters
         {
@@ -56,11 +62,20 @@ public class JwtService(IConfiguration config) : IJwtService
             var userId = principal.FindFirstValue(JwtRegisteredClaimNames.Sub)
                 ?? principal.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            return Guid.TryParse(userId, out var parsedUserId) ? parsedUserId : null;
+            if (!Guid.TryParse(userId, out var parsedUserId))
+            {
+                const string error = "Token validated, but no valid user id claim was found.";
+                _logger.LogWarning(error);
+                return new JwtValidationResult(false, null, error);
+            }
+
+            return new JwtValidationResult(true, parsedUserId, null);
         }
-        catch
+        catch (Exception exception)
         {
-            return null;
+            var error = $"{exception.GetType().Name}: {exception.Message}";
+            _logger.LogWarning(exception, "JWT validation failed: {Reason}", error);
+            return new JwtValidationResult(false, null, error);
         }
     }
 

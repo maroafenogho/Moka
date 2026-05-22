@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Moka.src.Authentication.Application;
 using Moka.src.Authentication.Domain.Interfaces;
@@ -18,14 +19,20 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserRepository, EfUserRepository>();
-builder.Services.AddScoped<AuthenticationService>();
+builder.Services.AddScoped<Moka.src.Authentication.Services.AuthenticationService>();
 builder.Services.AddScoped<RegisterUseCase>();
 builder.Services.AddScoped<LoginUseCase>();
 builder.Services.AddScoped<IBrokerageService, BrokerageService>();
 
+builder.Services
+    .AddAuthentication(JwtAuthenticationHandler.SchemeName)
+    .AddScheme<AuthenticationSchemeOptions, JwtAuthenticationHandler>(JwtAuthenticationHandler.SchemeName, null);
+builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 var app = builder.Build();
 
-app.MapControllers();
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 app.Run();
