@@ -5,5 +5,7 @@ namespace Moka.src.Brokerage.Domain.Enums
     {
         Broker = 1,
         Underwriter = 2,
+
+        Admin = 3,
     }
 }

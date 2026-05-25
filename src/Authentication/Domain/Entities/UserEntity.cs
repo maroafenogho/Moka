@@ -65,6 +65,8 @@ namespace Moka.src.Authentication.Domain.Entities
                 return Result.Failure("Company name required");
 
             companyName = companyName.Trim();
+            if (profileType == ProfileType.Admin)
+                return Result.Failure("An error occured");
 
             if (Profiles.Any(profile => profile.Type == profileType))
                 return Result.Failure($"User already has a {profileType} profile");
