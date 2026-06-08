@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Moka")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4dd3630b30d1fbd03dc260557a89abb46a421e84")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e2411bc439b077011f8335ed4bec5aca9def6c55")]
 [assembly: System.Reflection.AssemblyProductAttribute("Moka")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Moka")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
