@@ -23,8 +23,7 @@ namespace Moka.src.Insurance.Application.Dtos
         public DateTime? ToDate { get; set; }
         public string? Status { get; set; }
         public string? PolicyType { get; set; }
-        public decimal? MinAmount { get; set; }
-        public decimal? MaxAmount { get; set; }
+        public decimal? Amount { get; set; }
         public int? BrokerProfileId { get; set; }
         public int? UnderwriterProfileId { get; set; }
         public string? ProfileType { get; set; }

@@ -15,14 +15,14 @@ namespace Moka.src.Insurance.Api.Controllers
     {
         private readonly IInsurancePremiumService _service = service;
 
-        [HttpPost("premiums")]
+        [HttpPost("create-premium")]
         public async Task<IActionResult> CreatePremiumAsync([FromBody] CreateInsurancePremiumDto request)
         {
             var result = await _service.CreatePremiumAsync(request);
             return result.ToActionResult();
         }
 
-        [HttpGet("getPremiums")]
+        [HttpGet("get-premiums")]
         [Authorize(AuthenticationSchemes = JwtAuthenticationHandler.SchemeName)]
         public async Task<IActionResult> GetPremiumsAsync([FromQuery] GetInsurancePremiumsQueryDto query)
         {

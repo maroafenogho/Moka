@@ -17,8 +17,8 @@ namespace Moka.src.Insurance.Application.Services
             if (dto.Amount <= 0)
                 return Result<InsurancePremiumResponseDto>.Failure("Amount must be greater than zero");
 
-            if (string.IsNullOrWhiteSpace(dto.PolicyType))
-                return Result<InsurancePremiumResponseDto>.Failure("Policy type is required");
+            // if (string.IsNullOrWhiteSpace(dto.PolicyType))
+            //     return Result<InsurancePremiumResponseDto>.Failure("Policy type is required");
 
             var brokerProfile = await _context.Profiles
                 .FirstOrDefaultAsync(profile => profile.Id == dto.BrokerProfileId);
@@ -139,14 +139,9 @@ namespace Moka.src.Insurance.Application.Services
 
         public async Task<Result<List<InsurancePremiumResponseDto>>> GetPremiumsAsync(Guid userId, GetInsurancePremiumsQueryDto query)
         {
-            if (query.MinAmount.HasValue && query.MinAmount.Value < 0)
-                return Result<List<InsurancePremiumResponseDto>>.Failure("Minimum amount cannot be negative");
+            if (query.Amount.HasValue && query.Amount.Value < 0)
+                return Result<List<InsurancePremiumResponseDto>>.Failure("Amount cannot be negative");
 
-            if (query.MaxAmount.HasValue && query.MaxAmount.Value < 0)
-                return Result<List<InsurancePremiumResponseDto>>.Failure("Maximum amount cannot be negative");
-
-            if (query.MinAmount.HasValue && query.MaxAmount.HasValue && query.MinAmount.Value > query.MaxAmount.Value)
-                return Result<List<InsurancePremiumResponseDto>>.Failure("Minimum amount cannot be greater than maximum amount");
 
             if (query.FromDate.HasValue && query.ToDate.HasValue && query.FromDate.Value > query.ToDate.Value)
                 return Result<List<InsurancePremiumResponseDto>>.Failure("From date cannot be later than to date");
@@ -227,11 +222,8 @@ namespace Moka.src.Insurance.Application.Services
                 if (!string.IsNullOrWhiteSpace(query.PolicyType))
                     premiumQuery = premiumQuery.Where(premium =>
                         premium.PolicyType.ToLower().Trim() == query.PolicyType.ToLower().Trim());
-            if (query.MinAmount.HasValue)
-                premiumQuery = premiumQuery.Where(premium => premium.Amount >= query.MinAmount.Value);
-
-            if (query.MaxAmount.HasValue)
-                premiumQuery = premiumQuery.Where(premium => premium.Amount <= query.MaxAmount.Value);
+            if (query.Amount.HasValue)
+                premiumQuery = premiumQuery.Where(premium => premium.Amount >= query.Amount.Value);
 
             if (query.FromDate.HasValue)
                 premiumQuery = premiumQuery.Where(premium => premium.CreatedAt >= query.FromDate.Value);
