@@ -7,6 +7,8 @@ using Moka.src.Authentication.Infrastructure;
 using Moka.src.Authentication.Services;
 using Moka.src.Brokerage.Application.Interfaces;
 using Moka.src.Brokerage.Application.Services;
+using Moka.src.Insurance.Application.Interfaces;
+using Moka.src.Insurance.Application.Services;
 using Moka.src.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +25,7 @@ builder.Services.AddScoped<Moka.src.Authentication.Services.AuthenticationServic
 builder.Services.AddScoped<RegisterUseCase>();
 builder.Services.AddScoped<LoginUseCase>();
 builder.Services.AddScoped<IBrokerageService, BrokerageService>();
+builder.Services.AddScoped<IInsurancePremiumService, InsurancePremiumService>();
 
 builder.Services
     .AddAuthentication(JwtAuthenticationHandler.SchemeName)

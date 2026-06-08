@@ -5,7 +5,6 @@ namespace Moka.src.Shared
     public class Result<T>
     {
         public bool IsSuccess { get; }
-        public bool IsFailure => !IsSuccess;
         public string? Error { get; }
         public T? Data { get; }
 
@@ -29,7 +28,6 @@ namespace Moka.src.Shared
     public class Result
     {
         public bool IsSuccess { get; }
-        public bool IsFailure => !IsSuccess;
         public string? Error { get; }
         public object? Data { get; }
 

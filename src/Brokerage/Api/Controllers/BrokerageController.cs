@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Moka.src.Authentication.Services;
 using Moka.src.Brokerage.Application.Dtos;
 using Moka.src.Brokerage.Application.Interfaces;
 using Moka.src.Shared;
@@ -19,6 +21,8 @@ namespace Moka.src.Brokerage.Api.Controllers
         }
 
         [HttpGet("profile/{id}")]
+        [Authorize(AuthenticationSchemes = JwtAuthenticationHandler.SchemeName)]
+
         public async Task<IActionResult> GetProfileByIdAsync([FromRoute] int id)
         {
             var profile = await _service.GetProfileByIdAsync(id);
@@ -26,6 +30,8 @@ namespace Moka.src.Brokerage.Api.Controllers
         }
 
         [HttpGet("profiles")]
+        [Authorize(AuthenticationSchemes = JwtAuthenticationHandler.SchemeName)]
+
         public async Task<IActionResult> GetProfilesAsync()
         {
             var profiles = await _service.GetProfilesAsync();

@@ -32,7 +32,7 @@ public class AuthenticationService(
             request.MiddleName,
             _passwordHasher);
 
-        if (userResult.IsFailure || userResult.Data is null)
+        if (!userResult.IsSuccess || userResult.Data is null)
             return Result<AuthenticationResponse>.Failure(userResult.Error ?? "Could not create user");
 
         foreach (var profileRequest in request.GetRequestedProfiles())
@@ -41,12 +41,12 @@ public class AuthenticationService(
                 return Result<AuthenticationResponse>.Failure($"Invalid profile type: {profileRequest.ProfileType}");
 
             var addProfileResult = userResult.Data.AddProfile(profileType, profileRequest.CompanyName);
-            if (addProfileResult.IsFailure)
+            if (!addProfileResult.IsSuccess)
                 return Result<AuthenticationResponse>.Failure(addProfileResult.Error ?? "Could not add profile");
         }
 
         var saveResult = await _userRepository.AddUserAsync(userResult.Data);
-        if (saveResult.IsFailure)
+        if (!saveResult.IsSuccess)
             return Result<AuthenticationResponse>.Failure(saveResult.Error ?? "Could not save user");
 
         return Result<AuthenticationResponse>.Success(CreateResponse(userResult.Data));
@@ -57,7 +57,7 @@ public class AuthenticationService(
         var email = request.Email.Trim().ToLowerInvariant();
         var userResult = await _userRepository.GetUserByEmailAsync(email);
 
-        if (userResult.IsFailure || userResult.Data is null)
+        if (!userResult.IsSuccess || userResult.Data is null)
             return Result<LoginUserResponse>.Failure("Invalid email or password");
 
         var user = userResult.Data;
@@ -71,7 +71,7 @@ public class AuthenticationService(
     {
         var userResult = await _userRepository.GetUserByIdAsync(userId);
 
-        if (userResult.IsFailure || userResult.Data is null)
+        if (!userResult.IsSuccess || userResult.Data is null)
             return Result<UserResponse>.Failure(userResult.Error ?? "User not found");
 
         return Result<UserResponse>.Success(CreateUserResponse(userResult.Data));
