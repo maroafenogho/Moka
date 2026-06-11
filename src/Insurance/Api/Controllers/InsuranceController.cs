@@ -10,20 +10,20 @@ using Moka.src.Shared;
 namespace Moka.src.Insurance.Api.Controllers
 {
     [ApiController]
-    [Route("api/insurance")]
+    [Route("api/premiums")]
+    [Authorize(AuthenticationSchemes = JwtAuthenticationHandler.SchemeName)]
     public class InsuranceController(IInsurancePremiumService service) : ControllerBase
     {
         private readonly IInsurancePremiumService _service = service;
 
-        [HttpPost("create-premium")]
+        [HttpPost()]
         public async Task<IActionResult> CreatePremiumAsync([FromBody] CreateInsurancePremiumDto request)
         {
             var result = await _service.CreatePremiumAsync(request);
             return result.ToActionResult();
         }
 
-        [HttpGet("get-premiums")]
-        [Authorize(AuthenticationSchemes = JwtAuthenticationHandler.SchemeName)]
+        [HttpGet()]
         public async Task<IActionResult> GetPremiumsAsync([FromQuery] GetInsurancePremiumsQueryDto query)
         {
             var tokenUserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
@@ -36,8 +36,7 @@ namespace Moka.src.Insurance.Api.Controllers
             return result.ToActionResult();
         }
 
-        [HttpPut("premiums/{id}")]
-        [Authorize(AuthenticationSchemes = JwtAuthenticationHandler.SchemeName)]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePremiumAsync([FromRoute] Guid id, [FromBody] UpdateInsurancePremiumDto request)
         {
             var tokenUserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)

@@ -8,18 +8,14 @@ using Moka.src.Shared;
 
 namespace Moka.src.Authentication.Domain.Entities
 {
-    public class User
+    public class User : BaseEntity
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
         public Guid UserId { get; set; } = Guid.NewGuid();
         public string Email { get; private set; } = null!;
         public string PasswordHash { get; private set; } = null!;
         public string FirstName { get; private set; } = null!;
         public string LastName { get; private set; } = null!;
         public string? MiddleName { get; private set; }
-        public DateTime CreatedAt { get; private set; }
         public ICollection<Profile> Profiles { get; private set; } = new List<Profile>();
 
         private User() { }

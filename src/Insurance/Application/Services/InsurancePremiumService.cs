@@ -112,7 +112,7 @@ namespace Moka.src.Insurance.Application.Services
             var premium = await _context.InsurancePremiums
                 .Include(premium => premium.BrokerProfile)
                 .Include(premium => premium.UnderwriterProfile)
-                .FirstOrDefaultAsync(premium => premium.Id == premiumId);
+                .FirstOrDefaultAsync(premium => premium.PremiunmId == premiumId);
 
             if (premium == null)
                 return Result<InsurancePremiumResponseDto>.Failure("Premium not found");

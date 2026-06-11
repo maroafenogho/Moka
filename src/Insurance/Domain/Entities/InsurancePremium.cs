@@ -5,9 +5,10 @@ using Moka.src.Shared;
 
 namespace Moka.src.Insurance.Domain.Entities
 {
-    public class InsurancePremium : Entity
+    public class InsurancePremium : BaseEntity
     {
         public int BrokerProfileId { get; set; }
+        public Guid PremiunmId { get; set; }
         public Profile BrokerProfile { get; set; } = null!;
 
         public int UnderwriterProfileId { get; set; }
@@ -16,7 +17,5 @@ namespace Moka.src.Insurance.Domain.Entities
         public string PolicyType { get; set; } = string.Empty;
 
         public PremiumStatus Status { get; set; } = PremiumStatus.Pending;
-
-        public DateTime CreatedAt { get; set; }
     }
 }

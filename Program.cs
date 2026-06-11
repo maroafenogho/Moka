@@ -26,6 +26,7 @@ builder.Services.AddScoped<RegisterUseCase>();
 builder.Services.AddScoped<LoginUseCase>();
 builder.Services.AddScoped<IBrokerageService, BrokerageService>();
 builder.Services.AddScoped<IInsurancePremiumService, InsurancePremiumService>();
+builder.Services.AddHostedService<MigrationService>();
 
 builder.Services
     .AddAuthentication(JwtAuthenticationHandler.SchemeName)
